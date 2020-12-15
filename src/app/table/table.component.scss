@@ -1,0 +1,104 @@
+@import "~src/globalStyles/mixins";
+@import "~src/globalStyles/variables";
+
+.excel__table {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: $header-height + $toolbar-height + $formula-height;
+  overflow-x: auto;
+  padding-bottom: 2px;
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    min-height: 30px;
+    height: $row-height;
+  }
+
+  .row-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: $info-cell-width;
+    height: 100%;
+    border: 1px solid $border-color;
+    background: #f8f9fa;
+    border-top: none;
+  }
+
+  .row-data {
+    display: flex;
+  }
+
+  .column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background: #f8f9fa;
+    min-width: 40px;
+    width: $cell-width;
+    border: 1px solid $border-color;
+    border-top: 0;
+    border-left: 0;
+    height: 100%;
+
+    & .column-resize {
+      position: absolute;
+      top : 0;
+      right : -5px;
+      height: 100%;
+      z-index: 99;
+      cursor: ew-resize;
+      opacity: 1;
+      width: 10px;
+      background-color: transparent;
+
+      &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 100%;
+        width: 6px;
+        background-color: #215bd3;
+      }
+
+      &:hover {
+        opacity: 1 !important;
+      }
+
+      & .column-resize-line {
+        position: absolute;
+        top : 0;
+        right: 50%;
+        transform: translateX(50%);
+        z-index: 90;
+        width: 2px;
+        opacity: 0;
+        background-color: #215bd3;
+      }
+    }
+  }
+
+  .cell {
+    min-width: 40px;
+    padding: 5px;
+    width: $cell-width;
+    height: 100%;
+    border: 1px solid #e2e3e3;
+    border-top: 0;
+    border-left: 0;
+    color: #111;
+    white-space: nowrap;
+    outline: none;
+
+    &.selected {
+      border: none;
+      outline: 2px solid #3c74ff;
+      z-index: 2;
+    }
+  }
+}
