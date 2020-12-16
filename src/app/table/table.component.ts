@@ -2,30 +2,37 @@ import {Component, OnInit} from '@angular/core';
 import {Cell} from './interface/table.interface';
 import {SelectedService} from './services/selected.service';
 import {ResizeService} from './services/resize.service';
+import { KeyboardService } from './services/keyboard.service';
 
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
-  providers: [SelectedService]
+  providers: [SelectedService,
+              ResizeService,
+              KeyboardService
+  ]
 })
 export class TableComponent implements OnInit {
 
   alphabet: string[] = [];
   rows = [];
-  selectedCell = {row: 0, cell: 0};
-  editCell = {row: null, cell: null};
 
   constructor(
     private selectedService: SelectedService,
-    private resizeService : ResizeService
-  ) {
-  }
+    private resizeService : ResizeService,
+    private keyboardService : KeyboardService
+  ) {}
 
   ngOnInit(): void {
     this.creatAlphabet();
     this.creatRow(50);
+
     this.resizeService.rows = this.rows
+    this.selectedService.rows = this.rows
+
+    this.keyboardService.rows = this.rows
+    this.keyboardService.keyboardHandle()
   }
 
   creatAlphabet() {
@@ -56,45 +63,9 @@ export class TableComponent implements OnInit {
                         borderBottom: rowI === 0 && cellI === 0,
                         borderLeft: rowI === 0 && cellI === 0,
                         width : 120,
+                        height : 30
                       };
                     })
                 );
-  }
-
-  selected(event: MouseEvent, row = 0, col = 0) {
-
-    if (!event.shiftKey) {
-      this.selectedService.clearSelected(this.rows);
-
-      this.selectedService.updateOneCell(row, col, this.rows);
-
-      this.selectedCell.row = row;
-      this.selectedCell.cell = col;
-    }
-
-    this.selectedService.mouseDownFlag = true;
-  }
-
-  selectedGroup(event: MouseEvent, row, col) {
-    this.selectedService.clearSelected(this.rows);
-
-    const rows = this.selectedService.range(this.selectedCell.row, row);
-    const cols = this.selectedService.range(this.selectedCell.cell, col);
-
-    const groupCell = this.selectedService.createGroup(rows, cols);
-
-    this.selectedService.updateGroupCells(groupCell, this.rows);
-  }
-
-  setCellEdit(row, col, cell: HTMLDivElement) {
-    this.editCell.row = row;
-    this.editCell.cell = col;
-
-    const fn = setTimeout(focusEl);
-
-    function focusEl() {
-      cell.focus();
-      clearTimeout(fn);
-    }
   }
 }

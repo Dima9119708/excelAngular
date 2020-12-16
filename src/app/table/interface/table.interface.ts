@@ -6,4 +6,5 @@ export interface Cell {
   borderBottom: boolean,
   borderLeft: boolean,
   width : number
+  height : number
 }

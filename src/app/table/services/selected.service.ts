@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
 import {Cell} from '../interface/table.interface';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class SelectedService {
 
   rows = []
   mouseDownFlag = false
+  selectedCell = { row: 0, cell: 0 }
+  editCell = { row: null, cell: null, edit : false}
 
   constructor() {}
 
@@ -39,9 +39,45 @@ export class SelectedService {
     }, [])
   }
 
-  updateGroupCells(groupCell, rows) {
+  setCellEdit(row, col, cell: HTMLDivElement) {
+    this.editCell.row = row;
+    this.editCell.cell = col
+    this.editCell.edit = true
 
-    this.rows = rows
+    const fn = setTimeout(focusEl);
+
+    function focusEl() {
+      (<HTMLDivElement>cell.children[0]).focus();
+      clearTimeout(fn);
+    }
+  }
+
+  selected(event: MouseEvent, row = 0, col = 0) {
+
+    if (!event.shiftKey) {
+      this.clearSelected();
+      this.updateCell(row, col);
+    }
+    this.cellOverflow()
+
+    if(!this.editCell.edit) this.mouseDownFlag = true
+  }
+
+  selectedGroup(event: MouseEvent, row, col) {
+
+      if(this.mouseDownFlag) {
+        this.clearSelected();
+
+        const rows = this.range(this.selectedCell.row, row);
+        const cols = this.range(this.selectedCell.cell, col);
+
+        const groupCell = this.createGroup(rows, cols);
+
+        this.updateGroupCells(groupCell);
+      }
+  }
+
+  updateGroupCells(groupCell) {
 
     groupCell.forEach( (row, rowI) => {
 
@@ -61,8 +97,9 @@ export class SelectedService {
     })
   }
 
-  updateOneCell(row, col, rows) {
-    this.rows = rows
+  updateCell(row, col) {
+    this.selectedCell.row = row
+    this.selectedCell.cell = col
 
     this.rows[row][col].borderTop = true
     this.rows[row][col].borderRight = true
@@ -70,9 +107,18 @@ export class SelectedService {
     this.rows[row][col].borderBottom = true
   }
 
-  clearSelected(rows) {
-    this.rows = rows
+  cellOverflow() {
+    if ( this.selectedCell.row !== this.editCell.row
+         ||
+         this.selectedCell.cell !== this.editCell.cell
+    ) {
+      this.editCell.row = null
+      this.editCell.cell = null
+      this.editCell.edit = false
+    }
+  }
 
+  clearSelected() {
     this.rows.forEach( row => {
       row.forEach( (cell : Cell) => {
         cell.borderTop = false

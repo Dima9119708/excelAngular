@@ -21,7 +21,7 @@
         <div class="column-resize"
              (mousedown)="
                resizeService.excelTableHeight = excelTable.offsetHeight;
-               resizeService.resizeColHandle($event, index, colResizeLine)
+               resizeService.resizeCol($event, index, colResizeLine)
              "
              [ngStyle]="{
                 right : resizeService.currentColumn === index
@@ -54,8 +54,30 @@
     <div class="row-info">
       {{ rowI + 1 }}
 
-      <div class="row-resize">
-        <div class="row-resize-line"></div>
+      <div class="row-resize"
+           (mousedown)="
+               resizeService.excelTableWidth = excelTable.offsetWidth;
+               resizeService.resizeRow($event, rowI, rowResizeLine)
+             "
+           [ngStyle]="{
+                bottom : resizeService.currentRow === rowI
+                         &&
+                         -resizeService.delta + 'px',
+
+                opacity : resizeService.currentRow === rowI
+                          &&
+                          resizeService.resize ? 1 : 0
+             }"
+      >
+        <div class="row-resize-line"
+             #rowResizeLine
+             [ngStyle]="{
+                    opacity : resizeService.currentRow === rowI
+                              ? 1
+                              : 0
+              }"
+        >
+        </div>
       </div>
     </div>
 
@@ -63,23 +85,47 @@
 
       <div class="cell"
            *ngFor="let cell of row; let cellI = index"
-
-           [contentEditable]="editCell.row === rowI && editCell.cell === cellI"
+           #currentCell
 
            [ngStyle]="{
             'border-top': cell.borderTop ? '2px solid #3c74ff' : '1px solid #e2e3e3',
             'border-right': cell.borderRight ? '2px solid #3c74ff' : '1px solid #e2e3e3',
             'border-bottom': cell.borderBottom ? '2px solid #3c74ff' : '1px solid #e2e3e3',
             'border-left': cell.borderLeft ? '2px solid #3c74ff' : '1px solid #e2e3e3',
-            width : cell.width + 'px'
+            width : cell.width + 'px',
+            height : cell.height + 'px',
+            overflow : selectedService.editCell.row === rowI
+                       &&
+                       selectedService.editCell.cell === cellI
+                       ? 'visible'
+                       : 'hidden'
            }"
 
-           #currentCell
-           (mousedown)="selectedGroup($event, rowI, cellI); selected($event, rowI, cellI)"
-           (mousemove)="selectedService.mouseDownFlag && selectedGroup($event, rowI, cellI);"
+           (mousedown)="
+               selectedService.selectedGroup($event, rowI, cellI);
+               selectedService.selected($event, rowI, cellI)
+           "
+           (mousemove)="selectedService.selectedGroup($event, rowI, cellI)"
            (mouseup)="selectedService.clearMouseDownFlag()"
-           (dblclick)="setCellEdit(rowI, cellI, currentCell)"
+           (dblclick)="selectedService.setCellEdit(rowI, cellI, currentCell)"
       >
+        <div [contentEditable]="selectedService.editCell.row === rowI
+                                &&
+                                selectedService.editCell.cell === cellI"
+             [ngStyle]="{
+                outline : selectedService.editCell.row === rowI
+                          &&
+                          selectedService.editCell.cell === cellI
+                          ? '2px solid #167ad8'
+                          : 'none',
+                zIndex :  selectedService.editCell.row === rowI
+                          &&
+                          selectedService.editCell.cell === cellI
+                          ? 20
+                          : 10
+             }"
+        >
+        </div>
       </div>
 
     </div>
