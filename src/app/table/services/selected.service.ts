@@ -65,7 +65,7 @@ export class SelectedService {
 
   selectedGroup(event: MouseEvent, row, col) {
 
-      if(this.mouseDownFlag) {
+      if(this.mouseDownFlag || event.shiftKey) {
         this.clearSelected();
 
         const rows = this.range(this.selectedCell.row, row);
